@@ -1,13 +1,3 @@
-## ? Support
-
-If you encounter issues:
-
-1. Check the **Troubleshooting** section above
-2. Verify your browser version meets minimum requirements
-3. Ensure TradingView website is accessible
-4. Check browser console for error messages (F12)
-
----
 
 ## ? Support The Project
 
@@ -15,9 +5,7 @@ If you find this tool helpful and want to support my work, please consider buyin
 
 <a href="https://www.paypal.com/paypalme/Varma161" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-- **UPI:** `maheshtechnicals@apl`
 
----
 <img src="res/home.jpg" alt="Unlock PDF Screenshot" style="width:100%;max-width:400px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:24px;" />
 # PDF Password Remover
 
