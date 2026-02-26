@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlock PDF | Universal Secure Remover</title>
+    
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        // Ensure the worker loads correctly across all browsers
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            --btn-hover: linear-gradient(135deg, #2563eb, #7c3aed, #db2777);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+        }
+
+        /* --- Global Reset & Body --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 40%),
+                              radial-gradient(circle at bottom right, rgba(236, 72, 153, 0.15), transparent 40%);
+            padding: 20px;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: slideUp 0.6s ease-out forwards;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Typography --- */
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p.subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
+
+        /* --- Form Elements --- */
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-muted); }
+
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .file-upload-wrapper:hover { border-color: #8b5cf6; background: rgba(255, 255, 255, 0.05); }
+        .file-upload-wrapper input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-name-display { color: var(--text-muted); font-size: 0.9rem; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 15px; }
+
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        input:focus { border-color: #8b5cf6; }
+
+        /* --- Buttons --- */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn:hover { background: var(--btn-hover); box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* --- Status --- */
+        #status-area { margin-top: 20px; min-height: 40px; }
+        .status-msg { font-size: 0.9rem; margin-bottom: 5px; display: block; }
+        .error { color: var(--error-color); }
+        .success { color: var(--success-color); }
+        .warning { color: var(--warning-color); }
+        .info { color: var(--text-muted); }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 6px;
+            overflow: hidden;
+            display: none;
+            margin-top: 10px;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--success-color);
+            transition: width 0.3s ease;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s infinite linear;
+        }
+
+        /* Download Btn */
+        #download-btn { display: none; margin-top: 20px; background: #10b981; text-decoration: none; }
+        #download-btn:hover { background: #059669; }
+
+        .pwd-container { position: relative; }
+        .toggle-pwd { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Unlock PDF <span style="font-size: 0.5em; vertical-align: super; opacity: 0.7">PRO</span></h1>
+        <p class="subtitle">Universal Cross-Platform Remover</p>
+
+        <div class="input-group">
+            <label>Select Locked PDF</label>
+            <div class="file-upload-wrapper">
+                <input type="file" id="pdf-file" accept=".pdf">
+                <span class="file-name-display" id="file-name">Click or drag file here</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <div class="pwd-container">
+                <input type="password" id="pdf-password" placeholder="Enter document password">
+                <button type="button" class="toggle-pwd" id="toggle-pwd">Show</button>
+            </div>
+        </div>
+
+        <button class="btn" id="process-btn">
+            <span id="btn-text">Unlock File</span>
+            <div class="loader" id="loader"></div>
+        </button>
+
+        <div id="status-area">
+            <span id="status-text" class="status-msg"></span>
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <a href="#" class="btn" id="download-btn" download>Download Unlocked PDF</a>
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        const { jsPDF } = window.jspdf;
+
+        const fileInput = document.getElementById('pdf-file');
+        const fileNameDisplay = document.getElementById('file-name');
+        const passwordInput = document.getElementById('pdf-password');
+        const togglePwdBtn = document.getElementById('toggle-pwd');
+        const processBtn = document.getElementById('process-btn');
+        const btnText = document.getElementById('btn-text');
+        const loader = document.getElementById('loader');
+        const statusText = document.getElementById('status-text');
+        const downloadBtn = document.getElementById('download-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileNameDisplay.textContent = e.target.files[0].name;
+                fileNameDisplay.style.color = 'var(--text-main)';
+                resetUI();
+            }
+        });
+
+        togglePwdBtn.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePwdBtn.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+
+        processBtn.addEventListener('click', startProcess);
+
+        async function startProcess() {
+            const file = fileInput.files[0];
+            const password = passwordInput.value;
+
+            if (!file || !password) {
+                updateStatus('Please select a file and enter the password.', 'error');
+                return;
+            }
+
+            setLoading(true);
+            updateStatus('Attempting standard decryption...', 'info');
+
+            const arrayBuffer = await file.arrayBuffer();
+            let standardSuccess = false;
+
+            // --- THE CONSOLE MUZZLER ---
+            // Temporarily hide browser console warnings from pdf-lib
+            const originalWarn = console.warn;
+            const originalError = console.error;
+            
+            try {
+                console.warn = function() {}; 
+                console.error = function() {}; 
+
+                const pdfDoc = await PDFDocument.load(arrayBuffer, { password: password });
+                const pdfBytes = await pdfDoc.save();
+                finishProcess(pdfBytes, file.name);
+                standardSuccess = true;
+
+            } catch (err) {
+                // Ignore standard error intentionally
+            } finally {
+                // Restore the console so the rest of your app can debug normally
+                console.warn = originalWarn;
+                console.error = originalError;
+            }
+
+            // --- TRIGGER FALLBACK IF NEEDED ---
+            if (!standardSuccess) {
+                updateStatus('Advanced encryption detected. Activating Deep Recovery...', 'warning');
+                
+                setTimeout(async () => {
+                    try {
+                        await visualRecoveryUnlock(file, password);
+                    } catch (fallbackErr) {
+                        if(fallbackErr.message.includes('Password incorrect')) {
+                            updateStatus('Incorrect password. Please try again.', 'error');
+                        } else {
+                            updateStatus(`Failed to process PDF: Ensure file is not corrupted.`, 'error');
+                        }
+                        setLoading(false);
+                    }
+                }, 100);
+            }
+        }
+
+        async function visualRecoveryUnlock(file, password) {
+            const arrayBuffer = await file.arrayBuffer();
+            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer, password: password });
+            const pdf = await loadingTask.promise;
+            
+            const totalPages = pdf.numPages;
+            const pdfDoc = new jsPDF({ orientation: 'p', unit: 'mm' });
+            
+            progressContainer.style.display = 'block';
+
+            for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+                updateStatus(`Rebuilding page ${pageNum} of ${totalPages}...`, 'warning');
+                progressBar.style.width = `${(pageNum / totalPages) * 100}%`;
+
+                const page = await pdf.getPage(pageNum);
+                
+                // Optimized for mobile memory: Scale 1.5 is a sweet spot for quality vs memory footprint
+                const viewport = page.getViewport({ scale: 1.5 }); 
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.90); // 90% quality saves RAM
+                const imgProps = pdfDoc.getImageProperties(imgData);
+                
+                const pdfWidth = pdfDoc.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                if (pageNum > 1) pdfDoc.addPage();
+                pdfDoc.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+                // Give the browser event loop a tiny break to prevent freezing on mobile
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+
+            const pdfBytes = pdfDoc.output('arraybuffer');
+            finishProcess(pdfBytes, file.name);
+        }
+
+        function finishProcess(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            
+            downloadBtn.href = url;
+            downloadBtn.download = `Unlocked_${filename}`;
+            downloadBtn.style.display = 'flex';
+            
+            updateStatus('Success! Password removed.', 'success');
+            setLoading(false);
+            progressContainer.style.display = 'none';
+        }
+
+        function resetUI() {
+            downloadBtn.style.display = 'none';
+            statusText.textContent = '';
+            progressContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+        }
+
+        function updateStatus(msg, type) {
+            statusText.textContent = msg;
+            statusText.className = `status-msg ${type}`;
+        }
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                processBtn.disabled = true;
+                btnText.style.display = 'none';
+                loader.style.display = 'block';
+            } else {
+                processBtn.disabled = false;
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
