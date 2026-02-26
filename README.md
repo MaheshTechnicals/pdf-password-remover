@@ -1,12 +1,5 @@
 
-## ? Support The Project
-
-If you find this tool helpful and want to support my work, please consider buying me a coffee!
-
-<a href="https://www.paypal.com/paypalme/Varma161" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
-
-<img src="res/home.jpg" alt="Unlock PDF Screenshot" style="width:100%;max-width:400px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:24px;" />
+# <img src="res/home.jpg" alt="Unlock PDF Screenshot" style="width:100%;max-width:400px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:24px;" />
 # PDF Password Remover
 
 Unlock Secured PDF Files Instantly | Free & Open Source
@@ -76,6 +69,16 @@ Created by [MaheshTechnicals](https://github.com/MaheshTechnicals)
 ## Contributing
 
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+---
+
+## ? Support The Project
+
+If you find this tool helpful and want to support my work, please consider buying me a coffee!
+
+<a href="https://www.paypal.com/paypalme/Varma161" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
+- **UPI:** `maheshtechnicals@apl`
 
 ---
 
